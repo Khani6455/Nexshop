@@ -1,6 +1,7 @@
 
 import { useState } from "react";
-import ProductCard, { Product } from "./ProductCard";
+import ProductCard from "./ProductCard";
+import { Product } from "./ProductCard";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 interface RelatedProductsProps {
@@ -65,7 +66,18 @@ export default function RelatedProducts({ categoryProducts, currentProductId }: 
       
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {displayedProducts.map((product) => (
-          <ProductCard key={product.id} product={product} />
+          <ProductCard 
+            key={product.id}
+            id={product.id}
+            name={product.name}
+            price={product.price}
+            imageUrl={product.imageUrl || product.image || ""}
+            category={product.category}
+            originalPrice={product.originalPrice}
+            isNew={product.isNew}
+            isSale={product.isSale}
+            rating={product.rating}
+          />
         ))}
       </div>
     </section>

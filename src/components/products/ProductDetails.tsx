@@ -14,7 +14,7 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
   
   // Mock multiple product images
   const productImages = [
-    product.image,
+    product.image || product.imageUrl || "",
     "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80",
     "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80",
   ];

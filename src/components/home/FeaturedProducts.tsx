@@ -1,6 +1,7 @@
 
 import { useState } from "react";
-import ProductCard, { Product } from "../products/ProductCard";
+import ProductCard from "../products/ProductCard";
+import { Product } from "../products/ProductCard";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 // Mock data for featured products
@@ -11,6 +12,7 @@ const products: Product[] = [
     price: 79.99,
     originalPrice: 129.99,
     image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80",
+    imageUrl: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80",
     category: "Electronics",
     rating: 4.5,
     isSale: true
@@ -119,7 +121,18 @@ export default function FeaturedProducts() {
             <TabsContent key={category} value={category} className="m-0">
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
                 {filteredProducts.map((product) => (
-                  <ProductCard key={product.id} product={product} />
+                  <ProductCard 
+                    key={product.id} 
+                    id={product.id}
+                    name={product.name}
+                    price={product.price}
+                    imageUrl={product.imageUrl || product.image || ""}
+                    category={product.category}
+                    originalPrice={product.originalPrice}
+                    isNew={product.isNew}
+                    isSale={product.isSale}
+                    rating={product.rating}
+                  />
                 ))}
               </div>
             </TabsContent>

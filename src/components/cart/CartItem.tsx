@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { X } from "lucide-react";
 import { Product } from "../products/ProductCard";
@@ -6,8 +7,8 @@ import { toast } from "@/lib/toast";
 interface CartItemProps {
   product: Product;
   quantity: number;
-  onUpdateQuantity: (productId: number, quantity: number) => void;
-  onRemoveItem: (productId: number) => void;
+  onUpdateQuantity: (productId: number | string, quantity: number) => void;
+  onRemoveItem: (productId: number | string) => void;
 }
 
 export default function CartItem({ product, quantity, onUpdateQuantity, onRemoveItem }: CartItemProps) {
@@ -35,7 +36,7 @@ export default function CartItem({ product, quantity, onUpdateQuantity, onRemove
       {/* Product image */}
       <div className="w-full sm:w-24 h-24 mr-4 mb-3 sm:mb-0 flex-shrink-0">
         <img 
-          src={product.image} 
+          src={product.image || product.imageUrl} 
           alt={product.name} 
           className="w-full h-full object-cover rounded"
         />

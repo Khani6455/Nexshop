@@ -3,8 +3,23 @@ import { Link } from "react-router-dom";
 import { Heart, ShoppingCart, Eye } from "lucide-react";
 import { useState } from "react";
 
+export interface Product {
+  id: string | number;
+  name: string;
+  price: number;
+  imageUrl?: string;
+  image?: string; // Some components use image instead of imageUrl
+  category: string;
+  originalPrice?: number;
+  isNew?: boolean;
+  isSale?: boolean;
+  rating?: number;
+  description?: string;
+  stock?: number;
+}
+
 interface ProductCardProps {
-  id: string;
+  id: string | number;
   name: string;
   price: number;
   imageUrl: string;

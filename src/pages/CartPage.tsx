@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
@@ -68,7 +69,7 @@ const CartPage = () => {
     setTotal(newTotal);
   }, [cartItems]);
   
-  const handleUpdateQuantity = (productId: number, quantity: number) => {
+  const handleUpdateQuantity = (productId: number | string, quantity: number) => {
     setCartItems(
       cartItems.map((item) =>
         item.product.id === productId ? { ...item, quantity } : item
@@ -76,7 +77,7 @@ const CartPage = () => {
     );
   };
   
-  const handleRemoveItem = (productId: number) => {
+  const handleRemoveItem = (productId: number | string) => {
     setCartItems(cartItems.filter((item) => item.product.id !== productId));
   };
   
