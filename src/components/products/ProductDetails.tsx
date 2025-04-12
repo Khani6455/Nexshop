@@ -1,5 +1,5 @@
-
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Heart, Share2, Truck, ShieldCheck, RotateCcw } from "lucide-react";
 import { toast } from "@/lib/toast";
 import { Product } from "./ProductCard";
@@ -9,6 +9,7 @@ interface ProductDetailsProps {
 }
 
 export default function ProductDetails({ product }: ProductDetailsProps) {
+  const navigate = useNavigate();
   const [quantity, setQuantity] = useState(1);
   const [selectedImage, setSelectedImage] = useState(0);
   
@@ -36,6 +37,7 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
 
   const handleBuyNow = () => {
     toast.success("Proceeding to checkout...");
+    navigate("/checkout");
   };
 
   const decreaseQuantity = () => {

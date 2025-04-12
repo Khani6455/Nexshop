@@ -1,4 +1,6 @@
 
+import { useNavigate } from "react-router-dom";
+
 interface CartSummaryProps {
   subtotal: number;
   tax: number;
@@ -8,6 +10,13 @@ interface CartSummaryProps {
 }
 
 export default function CartSummary({ subtotal, tax, shipping, total, onCheckout }: CartSummaryProps) {
+  const navigate = useNavigate();
+  
+  const handleCheckout = () => {
+    onCheckout(); // Call the original onCheckout function
+    navigate("/checkout"); // Navigate to checkout page
+  };
+  
   return (
     <div className="bg-gray-50 rounded-lg p-6">
       <h2 className="text-xl font-bold mb-4">Order Summary</h2>
@@ -35,7 +44,7 @@ export default function CartSummary({ subtotal, tax, shipping, total, onCheckout
       
       <button
         className="w-full bg-purple-light hover:bg-purple text-white font-bold py-3 px-4 rounded-md transition-colors"
-        onClick={onCheckout}
+        onClick={handleCheckout}
       >
         Proceed to Checkout
       </button>
