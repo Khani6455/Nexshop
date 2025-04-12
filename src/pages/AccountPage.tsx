@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
@@ -10,7 +9,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { toast } from "@/lib/toast";
+import { toast } from "sonner";
 
 const profileSchema = z.object({
   firstName: z.string().min(2, {
@@ -65,11 +64,7 @@ export default function AccountPage() {
         });
       } catch (error) {
         console.error('Error fetching profile:', error);
-        toast({
-          title: "Error",
-          description: "Failed to load your profile information",
-          variant: "destructive"
-        });
+        toast("Failed to load your profile information");
       } finally {
         setIsLoading(false);
       }
@@ -94,17 +89,10 @@ export default function AccountPage() {
         throw error;
       }
 
-      toast({
-        title: "Profile updated",
-        description: "Your profile has been successfully updated.",
-      });
+      toast("Profile updated successfully");
     } catch (error: any) {
       console.error('Error updating profile:', error);
-      toast({
-        title: "Error",
-        description: "Failed to update your profile",
-        variant: "destructive"
-      });
+      toast("Failed to update your profile");
     }
   };
 

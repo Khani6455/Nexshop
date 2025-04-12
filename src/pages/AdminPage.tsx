@@ -1,9 +1,8 @@
-
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
-import { toast } from "@/lib/toast";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
@@ -67,11 +66,7 @@ export default function AdminPage() {
     }
 
     if (!isAdmin) {
-      toast({
-        title: "Access Denied",
-        description: "You do not have admin privileges",
-        variant: "destructive",
-      });
+      toast("Access Denied: You do not have admin privileges");
       navigate('/');
       return;
     }
@@ -102,11 +97,7 @@ export default function AdminPage() {
         
       } catch (error) {
         console.error('Error fetching admin data:', error);
-        toast({
-          title: "Error",
-          description: "Failed to load admin data",
-          variant: "destructive",
-        });
+        toast("Failed to load admin data");
       } finally {
         setLoading(false);
       }
@@ -153,17 +144,10 @@ export default function AdminPage() {
       if (error) throw error;
       
       setProducts(products.filter(p => p.id !== id));
-      toast({
-        title: "Product deleted",
-        description: "Product has been successfully deleted",
-      });
+      toast("Product deleted successfully");
     } catch (error) {
       console.error('Error deleting product:', error);
-      toast({
-        title: "Error",
-        description: "Failed to delete product",
-        variant: "destructive",
-      });
+      toast("Failed to delete product");
     }
   };
 
@@ -182,15 +166,21 @@ export default function AdminPage() {
           p.id === currentProduct.id ? { ...p, ...data } : p
         ));
         
-        toast({
-          title: "Product updated",
-          description: "Product has been successfully updated",
-        });
+        toast("Product updated successfully");
       } else {
-        // Add new product
+        // Add new product - Ensure all required fields are present
+        const newProductData = {
+          name: data.name,
+          description: data.description,
+          price: data.price,
+          image_url: data.image_url,
+          category: data.category,
+          stock: data.stock
+        };
+        
         const { data: newProduct, error } = await supabase
           .from('products')
-          .insert(data)
+          .insert(newProductData)
           .select()
           .single();
         
@@ -203,20 +193,13 @@ export default function AdminPage() {
           setCategories([...categories, data.category]);
         }
         
-        toast({
-          title: "Product added",
-          description: "New product has been successfully added",
-        });
+        toast("Product added successfully");
       }
       
       setIsModalOpen(false);
     } catch (error) {
       console.error('Error saving product:', error);
-      toast({
-        title: "Error",
-        description: "Failed to save product",
-        variant: "destructive",
-      });
+      toast("Failed to save product");
     }
   };
 

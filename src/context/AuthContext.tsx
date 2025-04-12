@@ -2,7 +2,7 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Session, User } from "@supabase/supabase-js";
-import { toast } from "@/lib/toast";
+import { toast } from "sonner";
 
 type AuthContextType = {
   session: Session | null;
@@ -91,26 +91,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       });
 
       if (error) {
-        toast({
-          title: "Sign up failed",
-          description: error.message,
-          variant: "destructive"
-        });
+        toast("Sign up failed: " + error.message);
         return { error };
       }
 
-      toast({
-        title: "Sign up successful",
-        description: "Welcome to NexShop!",
-      });
+      toast("Sign up successful! Welcome to NexShop!");
       
       return { error: null };
     } catch (error: any) {
-      toast({
-        title: "Sign up failed",
-        description: error.message,
-        variant: "destructive"
-      });
+      toast("Sign up failed: " + error.message);
       return { error };
     }
   };
@@ -123,36 +112,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       });
 
       if (error) {
-        toast({
-          title: "Sign in failed",
-          description: error.message,
-          variant: "destructive"
-        });
+        toast("Sign in failed: " + error.message);
         return { error };
       }
 
-      toast({
-        title: "Sign in successful",
-        description: "Welcome back!",
-      });
+      toast("Sign in successful! Welcome back!");
       
       return { error: null };
     } catch (error: any) {
-      toast({
-        title: "Sign in failed",
-        description: error.message,
-        variant: "destructive"
-      });
+      toast("Sign in failed: " + error.message);
       return { error };
     }
   };
 
   const signOut = async () => {
     await supabase.auth.signOut();
-    toast({
-      title: "Signed out",
-      description: "You have been successfully signed out.",
-    });
+    toast("Signed out successfully");
   };
 
   return (

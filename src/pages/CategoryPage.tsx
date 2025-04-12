@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import ProductCard from "@/components/products/ProductCard";
-import { toast } from "@/lib/toast";
+import { toast } from "sonner";
 
 type Product = {
   id: string;
@@ -42,11 +42,7 @@ export default function CategoryPage() {
         setProducts(data || []);
       } catch (error) {
         console.error('Error fetching products:', error);
-        toast({
-          title: "Error",
-          description: "Failed to load products",
-          variant: "destructive",
-        });
+        toast("Failed to load products");
       } finally {
         setLoading(false);
       }

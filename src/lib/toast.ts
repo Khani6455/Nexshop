@@ -1,4 +1,12 @@
 
 import { toast as sonnerToast } from "sonner";
 
-export const toast = sonnerToast;
+interface ToastOptions {
+  title?: string;
+  description?: string;
+  variant?: "default" | "destructive";
+}
+
+export const toast = (message: string) => {
+  sonnerToast(message);
+};

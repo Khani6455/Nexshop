@@ -3,26 +3,32 @@ import { Link } from "react-router-dom";
 import { Heart, ShoppingCart, Eye } from "lucide-react";
 import { useState } from "react";
 
-export interface Product {
-  id: number;
+interface ProductCardProps {
+  id: string;
   name: string;
   price: number;
-  originalPrice?: number;
-  image: string;
+  imageUrl: string;
   category: string;
-  rating: number;
+  originalPrice?: number;
   isNew?: boolean;
   isSale?: boolean;
+  rating?: number;
 }
 
-interface ProductCardProps {
-  product: Product;
-}
-
-export default function ProductCard({ product }: ProductCardProps) {
+export default function ProductCard({ 
+  id, 
+  name, 
+  price, 
+  imageUrl, 
+  category,
+  originalPrice,
+  isNew = false,
+  isSale = false,
+  rating = 0
+}: ProductCardProps) {
   const [isHovered, setIsHovered] = useState(false);
-  const discount = product.originalPrice 
-    ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100) 
+  const discount = originalPrice 
+    ? Math.round(((originalPrice - price) / originalPrice) * 100) 
     : 0;
 
   return (
@@ -33,23 +39,23 @@ export default function ProductCard({ product }: ProductCardProps) {
     >
       <div className="relative overflow-hidden pb-[100%]">
         {/* Product image */}
-        <Link to={`/product/${product.id}`}>
+        <Link to={`/product/${id}`}>
           <img 
-            src={product.image} 
-            alt={product.name} 
+            src={imageUrl} 
+            alt={name} 
             className="absolute top-0 left-0 w-full h-full object-cover transition-transform duration-300 hover:scale-105"
           />
         </Link>
         
         {/* Badges */}
         <div className="absolute top-2 left-2 flex flex-col space-y-2">
-          {product.isNew && (
+          {isNew && (
             <span className="badge badge-primary">New</span>
           )}
-          {product.isSale && (
+          {isSale && (
             <span className="badge badge-sale">Sale</span>
           )}
-          {product.originalPrice && (
+          {originalPrice && (
             <span className="badge badge-sale">{discount}% Off</span>
           )}
         </div>
@@ -83,44 +89,48 @@ export default function ProductCard({ product }: ProductCardProps) {
 
       <div className="p-4">
         {/* Category */}
-        <div className="text-sm text-gray-500 mb-1">{product.category}</div>
+        <div className="text-sm text-gray-500 mb-1">{category}</div>
         
         {/* Product name */}
-        <Link to={`/product/${product.id}`}>
+        <Link to={`/product/${id}`}>
           <h3 className="font-medium mb-2 hover:text-purple transition-colors line-clamp-2">
-            {product.name}
+            {name}
           </h3>
         </Link>
         
         {/* Rating */}
-        <div className="flex mb-2">
-          {[...Array(5)].map((_, i) => (
-            <svg 
-              key={i} 
-              className={`w-4 h-4 ${
-                i < Math.floor(product.rating) 
-                  ? 'text-yellow-400' 
-                  : i < product.rating 
-                  ? 'text-yellow-400' 
-                  : 'text-gray-300'
-              }`}
-              fill="currentColor" 
-              viewBox="0 0 20 20"
-            >
-              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-            </svg>
-          ))}
-          <span className="text-sm text-gray-500 ml-1">({product.rating})</span>
-        </div>
+        {rating > 0 && (
+          <div className="flex mb-2">
+            {[...Array(5)].map((_, i) => (
+              <svg 
+                key={i} 
+                className={`w-4 h-4 ${
+                  i < Math.floor(rating) 
+                    ? 'text-yellow-400' 
+                    : i < rating 
+                    ? 'text-yellow-400' 
+                    : 'text-gray-300'
+                }`}
+                fill="currentColor" 
+                viewBox="0 0 20 20"
+              >
+                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+              </svg>
+            ))}
+            {rating > 0 && <span className="text-sm text-gray-500 ml-1">({rating})</span>}
+          </div>
+        )}
         
         {/* Price */}
         <div className="flex items-center">
-          {product.originalPrice && (
-            <span className="text-gray-500 line-through mr-2">${product.originalPrice.toFixed(2)}</span>
+          {originalPrice && (
+            <span className="text-gray-500 line-through mr-2">${originalPrice.toFixed(2)}</span>
           )}
-          <span className="text-lg font-bold text-purple">${product.price.toFixed(2)}</span>
+          <span className="text-lg font-bold text-purple">${price.toFixed(2)}</span>
         </div>
       </div>
     </div>
   );
 }
+
+export type { ProductCardProps };
