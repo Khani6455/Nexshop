@@ -1,7 +1,7 @@
 
 import { useState } from "react";
 import { Heart, Share2, Truck, ShieldCheck, RotateCcw } from "lucide-react";
-import { toast } from "@/components/ui/sonner";
+import { toast } from "@/lib/toast";
 import { Product } from "./ProductCard";
 
 interface ProductDetailsProps {

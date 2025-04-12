@@ -1,6 +1,5 @@
-
 import { useState } from "react";
-import { toast } from "@/components/ui/sonner";
+import { toast } from "@/lib/toast";
 
 export default function NewsletterSection() {
   const [email, setEmail] = useState("");

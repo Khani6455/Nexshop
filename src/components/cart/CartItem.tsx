@@ -1,8 +1,7 @@
-
 import { useState } from "react";
 import { X } from "lucide-react";
 import { Product } from "../products/ProductCard";
-import { toast } from "@/components/ui/sonner";
+import { toast } from "@/lib/toast";
 
 interface CartItemProps {
   product: Product;

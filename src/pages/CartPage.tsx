@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
@@ -6,7 +5,7 @@ import CartItem from "@/components/cart/CartItem";
 import CartSummary from "@/components/cart/CartSummary";
 import { ShoppingCart, ArrowLeft } from "lucide-react";
 import { Product } from "@/components/products/ProductCard";
-import { toast } from "@/components/ui/sonner";
+import { toast } from "@/lib/toast";
 
 // Mock cart items
 const initialCartItems = [
