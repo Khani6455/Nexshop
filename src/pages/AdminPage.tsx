@@ -169,10 +169,19 @@ export default function AdminPage() {
         
         toast("Product updated successfully");
       } else {
-        // Add new product
+        // Add new product - Ensure all required fields are present
+        const newProductData = {
+          name: data.name,
+          description: data.description,
+          price: data.price,
+          image_url: data.image_url,
+          category: data.category,
+          stock: data.stock
+        };
+        
         const { data: newProduct, error } = await supabase
           .from('products')
-          .insert(data)
+          .insert(newProductData)
           .select()
           .single();
         
