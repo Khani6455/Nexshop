@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
@@ -168,19 +169,10 @@ export default function AdminPage() {
         
         toast("Product updated successfully");
       } else {
-        // Add new product - Ensure all required fields are present
-        const newProductData = {
-          name: data.name,
-          description: data.description,
-          price: data.price,
-          image_url: data.image_url,
-          category: data.category,
-          stock: data.stock
-        };
-        
+        // Add new product
         const { data: newProduct, error } = await supabase
           .from('products')
-          .insert(newProductData)
+          .insert(data)
           .select()
           .single();
         
