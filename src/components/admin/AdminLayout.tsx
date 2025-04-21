@@ -2,6 +2,7 @@
 import { ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
+import { ShieldCheck } from "lucide-react";
 
 type AdminLayoutProps = {
   children: ReactNode;
@@ -14,7 +15,10 @@ export const AdminLayout = ({ children, title = "Admin Dashboard" }: AdminLayout
   return (
     <div className="container-custom py-10">
       <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold">{title}</h1>
+        <div className="flex items-center gap-2">
+          <ShieldCheck className="h-6 w-6 text-primary" />
+          <h1 className="text-3xl font-bold">{title}</h1>
+        </div>
         <Button onClick={() => navigate('/account')}>Back to Account</Button>
       </div>
       {children}

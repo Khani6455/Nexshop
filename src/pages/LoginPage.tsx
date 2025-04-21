@@ -8,7 +8,8 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 const loginSchema = z.object({
   email: z.string().email({
@@ -22,14 +23,29 @@ const loginSchema = z.object({
 type LoginForm = z.infer<typeof loginSchema>;
 
 export default function LoginPage() {
-  const { signIn, user } = useAuth();
+  const { signIn, user, isAdmin } = useAuth();
   const navigate = useNavigate();
+  const [isRedirecting, setIsRedirecting] = useState(false);
   
   useEffect(() => {
     if (user) {
-      navigate('/');
+      setIsRedirecting(true);
+      
+      // If the user is an admin, show admin-specific message
+      if (isAdmin) {
+        toast.success("Welcome back, Admin!");
+        // Redirect to admin page after a short delay
+        const timer = setTimeout(() => {
+          navigate('/admin');
+        }, 500);
+        return () => clearTimeout(timer);
+      } else {
+        // Normal user
+        toast.success("Welcome back!");
+        navigate('/');
+      }
     }
-  }, [user, navigate]);
+  }, [user, isAdmin, navigate]);
 
   const form = useForm<LoginForm>({
     resolver: zodResolver(loginSchema),
@@ -41,9 +57,11 @@ export default function LoginPage() {
 
   const onSubmit = async (values: LoginForm) => {
     const { error } = await signIn(values.email, values.password);
-    if (!error) {
-      navigate('/');
+    if (error) {
+      // Error is already handled in the auth context
+      return;
     }
+    // Success case is handled in the useEffect above
   };
 
   return (
@@ -84,19 +102,23 @@ export default function LoginPage() {
                 )}
               />
               
-              <Button type="submit" className="w-full" disabled={form.formState.isSubmitting}>
-                {form.formState.isSubmitting ? "Signing In..." : "Sign In"}
+              <Button type="submit" className="w-full" disabled={form.formState.isSubmitting || isRedirecting}>
+                {form.formState.isSubmitting || isRedirecting ? "Signing In..." : "Sign In"}
               </Button>
             </form>
           </Form>
         </CardContent>
-        <CardFooter className="flex justify-center">
+        <CardFooter className="flex flex-col gap-4">
           <p className="text-sm text-muted-foreground">
             Don't have an account yet?{" "}
             <Link to="/register" className="text-primary hover:underline">
               Register
             </Link>
           </p>
+          
+          <div className="text-xs text-muted-foreground text-center w-full">
+            <p>Admin users will be automatically redirected to the admin dashboard.</p>
+          </div>
         </CardFooter>
       </Card>
     </div>

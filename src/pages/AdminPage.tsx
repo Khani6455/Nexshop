@@ -1,5 +1,5 @@
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -12,9 +12,10 @@ import { CategoryList } from "@/components/admin/CategoryList";
 import { UserManagement } from "@/components/admin/UserManagement";
 import { ProductFormDialog } from "@/components/admin/ProductFormDialog";
 import { useProductManagement } from "@/hooks/useProductManagement";
+import { Button } from "@/components/ui/button";
 
 export default function AdminPage() {
-  const { user, isAdmin } = useAuth();
+  const { user, isAdmin, isLoading } = useAuth();
   const navigate = useNavigate();
   const [usersCount, setUsersCount] = useState(0);
   
@@ -35,12 +36,13 @@ export default function AdminPage() {
   } = useProductManagement();
 
   useEffect(() => {
-    if (!user) {
+    if (!isLoading && !user) {
+      toast.error("Please login to access the admin dashboard");
       navigate('/login');
       return;
     }
 
-    if (!isAdmin) {
+    if (!isLoading && !isAdmin) {
       toast.error("Access Denied: You do not have admin privileges");
       navigate('/');
       return;
@@ -74,15 +76,23 @@ export default function AdminPage() {
       }
     };
 
-    fetchAdminData();
-  }, [user, isAdmin, navigate, setProducts, setLoading]);
+    if (user && isAdmin) {
+      fetchAdminData();
+    }
+  }, [user, isAdmin, isLoading, navigate, setProducts, setLoading]);
 
-  if (loading) {
+  if (isLoading) {
     return (
       <AdminLayout>
-        <p>Loading admin dashboard...</p>
+        <div className="flex justify-center items-center h-64">
+          <p>Loading admin dashboard...</p>
+        </div>
       </AdminLayout>
     );
+  }
+
+  if (!user || !isAdmin) {
+    return null; // Will be redirected by the useEffect
   }
 
   return (

@@ -58,7 +58,14 @@ export const useProductManagement = (initialProducts: Product[] = []) => {
       if (currentProduct) {
         const { error } = await supabase
           .from('products')
-          .update(data)
+          .update({
+            name: data.name,
+            description: data.description,
+            price: data.price,
+            image_url: data.image_url,
+            category: data.category,
+            stock: data.stock
+          })
           .eq('id', currentProduct.id);
         
         if (error) throw error;
@@ -71,7 +78,14 @@ export const useProductManagement = (initialProducts: Product[] = []) => {
       } else {
         const { data: newProduct, error } = await supabase
           .from('products')
-          .insert(data)
+          .insert({
+            name: data.name,
+            description: data.description,
+            price: data.price,
+            image_url: data.image_url,
+            category: data.category,
+            stock: data.stock
+          })
           .select()
           .single();
         
