@@ -36,49 +36,47 @@ export default function AdminPage() {
   } = useProductManagement();
 
   useEffect(() => {
-    if (!isLoading && !user) {
-      toast.error("Please login to access the admin dashboard");
-      navigate('/login');
-      return;
-    }
-
-    if (!isLoading && !isAdmin) {
-      toast.error("Access Denied: You do not have admin privileges");
-      navigate('/');
-      return;
+    if (!isLoading) {
+      if (!user) {
+        toast.error("Please login to access the admin dashboard");
+        navigate('/login');
+      } else if (!isAdmin) {
+        toast.error("Access Denied: You do not have admin privileges");
+        navigate('/');
+      }
     }
 
     const fetchAdminData = async () => {
-      setLoading(true);
-      
-      try {
-        // Fetch products
-        const { data: productsData, error: productsError } = await supabase
-          .from('products')
-          .select('*');
+      if (user && isAdmin) {
+        setLoading(true);
         
-        if (productsError) throw productsError;
-        setProducts(productsData || []);
-        
-        // Count users
-        const { count, error: usersError } = await supabase
-          .from('profiles')
-          .select('*', { count: 'exact', head: true });
-        
-        if (usersError) throw usersError;
-        setUsersCount(count || 0);
-        
-      } catch (error) {
-        console.error('Error fetching admin data:', error);
-        toast.error("Failed to load admin data");
-      } finally {
-        setLoading(false);
+        try {
+          // Fetch products
+          const { data: productsData, error: productsError } = await supabase
+            .from('products')
+            .select('*');
+          
+          if (productsError) throw productsError;
+          setProducts(productsData || []);
+          
+          // Count users
+          const { count, error: usersError } = await supabase
+            .from('profiles')
+            .select('*', { count: 'exact', head: true });
+          
+          if (usersError) throw usersError;
+          setUsersCount(count || 0);
+          
+        } catch (error) {
+          console.error('Error fetching admin data:', error);
+          toast.error("Failed to load admin data");
+        } finally {
+          setLoading(false);
+        }
       }
     };
 
-    if (user && isAdmin) {
-      fetchAdminData();
-    }
+    fetchAdminData();
   }, [user, isAdmin, isLoading, navigate, setProducts, setLoading]);
 
   if (isLoading) {
@@ -91,8 +89,9 @@ export default function AdminPage() {
     );
   }
 
+  // This will be handled by the useEffect redirect
   if (!user || !isAdmin) {
-    return null; // Will be redirected by the useEffect
+    return null;
   }
 
   return (

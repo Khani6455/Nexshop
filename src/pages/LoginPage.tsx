@@ -31,16 +31,10 @@ export default function LoginPage() {
     if (user) {
       setIsRedirecting(true);
       
-      // If the user is an admin, show admin-specific message
       if (isAdmin) {
         toast.success("Welcome back, Admin!");
-        // Redirect to admin page after a short delay
-        const timer = setTimeout(() => {
-          navigate('/admin');
-        }, 500);
-        return () => clearTimeout(timer);
+        navigate('/admin');
       } else {
-        // Normal user
         toast.success("Welcome back!");
         navigate('/');
       }
