@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
@@ -10,6 +9,7 @@ import { AdminLayout } from "@/components/admin/AdminLayout";
 import { DashboardStats } from "@/components/admin/DashboardStats";
 import { ProductTable } from "@/components/admin/ProductTable";
 import { CategoryList } from "@/components/admin/CategoryList";
+import { UserManagement } from "@/components/admin/UserManagement";
 import { ProductForm, ProductFormValues } from "@/components/admin/ProductForm";
 
 // Types
@@ -201,6 +201,7 @@ export default function AdminPage() {
         <TabsList>
           <TabsTrigger value="products">Products</TabsTrigger>
           <TabsTrigger value="categories">Categories</TabsTrigger>
+          <TabsTrigger value="users">Users</TabsTrigger>
         </TabsList>
         
         <TabsContent value="products" className="py-4">
@@ -216,8 +217,14 @@ export default function AdminPage() {
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-2xl font-semibold">Categories</h2>
           </div>
-          
           <CategoryList categories={categories} products={products} />
+        </TabsContent>
+
+        <TabsContent value="users" className="py-4">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-2xl font-semibold">User Management</h2>
+          </div>
+          <UserManagement />
         </TabsContent>
       </Tabs>
 
