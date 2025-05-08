@@ -8,7 +8,8 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 const registerSchema = z.object({
   firstName: z.string().min(2, {
@@ -34,6 +35,7 @@ type RegisterForm = z.infer<typeof registerSchema>;
 export default function RegisterPage() {
   const { signUp, user } = useAuth();
   const navigate = useNavigate();
+  const [registerError, setRegisterError] = useState("");
   
   useEffect(() => {
     if (user) {
@@ -53,6 +55,7 @@ export default function RegisterPage() {
   });
 
   const onSubmit = async (values: RegisterForm) => {
+    setRegisterError("");
     const { error } = await signUp(
       values.email,
       values.password,
@@ -60,9 +63,13 @@ export default function RegisterPage() {
       values.lastName
     );
 
-    if (!error) {
-      navigate('/login');
+    if (error) {
+      setRegisterError(error.message || "Registration failed. Please try again.");
+      return;
     }
+
+    toast.success("Account created! Please log in.");
+    navigate('/login');
   };
 
   return (
@@ -146,6 +153,10 @@ export default function RegisterPage() {
                   </FormItem>
                 )}
               />
+              
+              {registerError && (
+                <div className="text-destructive text-sm">{registerError}</div>
+              )}
               
               <Button type="submit" className="w-full" disabled={form.formState.isSubmitting}>
                 {form.formState.isSubmitting ? "Creating Account..." : "Create Account"}

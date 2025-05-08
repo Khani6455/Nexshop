@@ -12,6 +12,7 @@ import CheckoutPage from "./pages/CheckoutPage";
 import OrderConfirmationPage from "./pages/OrderConfirmationPage";
 import NotFound from "./pages/NotFound";
 import LoginPage from "./pages/LoginPage";
+import AdminLoginPage from "./pages/AdminLoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import AccountPage from "./pages/AccountPage";
 import AdminPage from "./pages/AdminPage";
@@ -33,6 +34,7 @@ const App = () => (
             <Route path="/checkout" element={<CheckoutPage />} />
             <Route path="/order-confirmation" element={<OrderConfirmationPage />} />
             <Route path="/login" element={<LoginPage />} />
+            <Route path="/admin-login" element={<AdminLoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
             <Route path="/account" element={<AccountPage />} />
             <Route path="/admin" element={<AdminPage />} />

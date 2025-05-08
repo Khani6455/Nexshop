@@ -18,6 +18,7 @@ export default function AdminPage() {
   const { user, isAdmin, isLoading } = useAuth();
   const navigate = useNavigate();
   const [usersCount, setUsersCount] = useState(0);
+  const [authChecked, setAuthChecked] = useState(false);
   
   const {
     products,
@@ -36,18 +37,28 @@ export default function AdminPage() {
   } = useProductManagement();
 
   useEffect(() => {
+    // Check authentication status once loading is complete
     if (!isLoading) {
       if (!user) {
         toast.error("Please login to access the admin dashboard");
-        navigate('/login');
-      } else if (!isAdmin) {
+        navigate('/admin-login');
+        return;
+      } 
+      
+      if (!isAdmin) {
         toast.error("Access Denied: You do not have admin privileges");
         navigate('/');
+        return;
       }
+      
+      setAuthChecked(true);
     }
+  }, [user, isAdmin, isLoading, navigate]);
 
-    const fetchAdminData = async () => {
-      if (user && isAdmin) {
+  useEffect(() => {
+    // Only fetch data if user is authenticated and is admin
+    if (authChecked && user && isAdmin) {
+      const fetchAdminData = async () => {
         setLoading(true);
         
         try {
@@ -73,11 +84,11 @@ export default function AdminPage() {
         } finally {
           setLoading(false);
         }
-      }
-    };
+      };
 
-    fetchAdminData();
-  }, [user, isAdmin, isLoading, navigate, setProducts, setLoading]);
+      fetchAdminData();
+    }
+  }, [authChecked, user, isAdmin, setLoading, setProducts]);
 
   if (isLoading) {
     return (

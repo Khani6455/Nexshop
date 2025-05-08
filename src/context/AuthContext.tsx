@@ -47,8 +47,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       if (session?.user) {
         checkAdminStatus(session.user.id);
+      } else {
+        setIsLoading(false);
       }
-      setIsLoading(false);
     });
 
     return () => {
@@ -67,13 +68,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (error) {
         console.error('Error checking admin status:', error);
         setIsAdmin(false);
-        return;
+      } else {
+        setIsAdmin(data?.is_admin || false);
       }
-
-      setIsAdmin(data?.is_admin || false);
     } catch (error) {
       console.error('Error checking admin status:', error);
       setIsAdmin(false);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -91,15 +93,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       });
 
       if (error) {
-        toast("Sign up failed: " + error.message);
+        console.error("Sign up error:", error);
+        toast.error("Sign up failed: " + error.message);
         return { error };
       }
 
-      toast("Sign up successful! Welcome to NexShop!");
-      
+      // Don't toast success here - the RegisterPage will handle it
       return { error: null };
     } catch (error: any) {
-      toast("Sign up failed: " + error.message);
+      console.error("Sign up error:", error);
+      toast.error("Sign up failed: " + error.message);
       return { error };
     }
   };
@@ -112,22 +115,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       });
 
       if (error) {
-        toast("Sign in failed: " + error.message);
+        console.error("Sign in error:", error);
         return { error };
       }
 
-      toast("Sign in successful! Welcome back!");
-      
+      // Don't toast here - the calling component will handle success
       return { error: null };
     } catch (error: any) {
-      toast("Sign in failed: " + error.message);
+      console.error("Sign in error:", error);
       return { error };
     }
   };
 
   const signOut = async () => {
     await supabase.auth.signOut();
-    toast("Signed out successfully");
+    toast.success("Signed out successfully");
   };
 
   return (
