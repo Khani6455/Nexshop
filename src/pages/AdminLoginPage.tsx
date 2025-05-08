@@ -24,25 +24,29 @@ const adminLoginSchema = z.object({
 type AdminLoginForm = z.infer<typeof adminLoginSchema>;
 
 export default function AdminLoginPage() {
-  const { signIn, user, isAdmin } = useAuth();
+  const { signIn, user, isAdmin, isLoading } = useAuth();
   const navigate = useNavigate();
   const [isRedirecting, setIsRedirecting] = useState(false);
   const [loginError, setLoginError] = useState("");
   
   useEffect(() => {
+    if (isLoading) return;
+    
     if (user) {
       setIsRedirecting(true);
       
       if (isAdmin) {
+        console.log("User is admin, redirecting to admin page");
         toast.success("Welcome back, Admin!");
         navigate('/admin');
       } else {
         // If user is logged in but not an admin, show error and redirect to home
+        console.log("User is not admin, redirecting to home");
         toast.error("Access Denied: You do not have admin privileges");
         navigate('/');
       }
     }
-  }, [user, isAdmin, navigate]);
+  }, [user, isAdmin, navigate, isLoading]);
 
   const form = useForm<AdminLoginForm>({
     resolver: zodResolver(adminLoginSchema),
@@ -54,6 +58,7 @@ export default function AdminLoginPage() {
 
   const onSubmit = async (values: AdminLoginForm) => {
     setLoginError("");
+    console.log("Attempting admin login with:", values.email);
     const { error } = await signIn(values.email, values.password);
     if (error) {
       setLoginError(error.message || "Login failed. Please check your credentials.");
@@ -61,6 +66,22 @@ export default function AdminLoginPage() {
     }
     // Success case is handled in the useEffect above
   };
+
+  if (isLoading) {
+    return (
+      <div className="container-custom max-w-md py-10">
+        <Card className="border-primary/20">
+          <CardHeader className="bg-primary/5">
+            <div className="flex items-center justify-center mb-4">
+              <Shield className="w-12 h-12 text-primary" />
+            </div>
+            <CardTitle className="text-center">Admin Login</CardTitle>
+            <CardDescription className="text-center">Checking authentication status...</CardDescription>
+          </CardHeader>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="container-custom max-w-md py-10">

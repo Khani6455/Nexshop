@@ -37,20 +37,24 @@ export default function AdminPage() {
   } = useProductManagement();
 
   useEffect(() => {
+    console.log("AdminPage auth check:", { user: !!user, isAdmin, isLoading });
     // Check authentication status once loading is complete
     if (!isLoading) {
       if (!user) {
+        console.log("No user found, redirecting to admin login");
         toast.error("Please login to access the admin dashboard");
         navigate('/admin-login');
         return;
       } 
       
       if (!isAdmin) {
+        console.log("User is not admin, redirecting to home");
         toast.error("Access Denied: You do not have admin privileges");
         navigate('/');
         return;
       }
       
+      console.log("User is authenticated as admin");
       setAuthChecked(true);
     }
   }, [user, isAdmin, isLoading, navigate]);
@@ -58,6 +62,7 @@ export default function AdminPage() {
   useEffect(() => {
     // Only fetch data if user is authenticated and is admin
     if (authChecked && user && isAdmin) {
+      console.log("Fetching admin data");
       const fetchAdminData = async () => {
         setLoading(true);
         
@@ -78,6 +83,7 @@ export default function AdminPage() {
           if (usersError) throw usersError;
           setUsersCount(count || 0);
           
+          console.log("Admin data fetched successfully");
         } catch (error) {
           console.error('Error fetching admin data:', error);
           toast.error("Failed to load admin data");
@@ -102,7 +108,16 @@ export default function AdminPage() {
 
   // This will be handled by the useEffect redirect
   if (!user || !isAdmin) {
-    return null;
+    return (
+      <AdminLayout>
+        <div className="flex flex-col items-center justify-center h-64 gap-4">
+          <p className="text-destructive">Checking admin privileges...</p>
+          <Button onClick={() => navigate('/admin-login')}>
+            Go to Admin Login
+          </Button>
+        </div>
+      </AdminLayout>
+    );
   }
 
   return (

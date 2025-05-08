@@ -25,23 +25,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
+      async (event, session) => {
+        console.log("Auth state changed:", event, session?.user?.id);
         setSession(session);
         setUser(session?.user ?? null);
         
-        // Use setTimeout to avoid Supabase deadlock issues
         if (session?.user) {
+          // Use setTimeout to avoid Supabase deadlock issues
           setTimeout(() => {
             checkAdminStatus(session.user.id);
           }, 0);
         } else {
           setIsAdmin(false);
+          setIsLoading(false);
         }
       }
     );
 
     // THEN check for existing session
     supabase.auth.getSession().then(({ data: { session } }) => {
+      console.log("Initial session check:", session?.user?.id);
       setSession(session);
       setUser(session?.user ?? null);
       
@@ -58,6 +61,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const checkAdminStatus = async (userId: string) => {
+    console.log("Checking admin status for user:", userId);
     try {
       const { data, error } = await supabase
         .from('profiles')
@@ -69,6 +73,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         console.error('Error checking admin status:', error);
         setIsAdmin(false);
       } else {
+        console.log("Admin status result:", data);
         setIsAdmin(data?.is_admin || false);
       }
     } catch (error) {
@@ -119,6 +124,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return { error };
       }
 
+      console.log("Sign in successful, checking admin status");
       // Don't toast here - the calling component will handle success
       return { error: null };
     } catch (error: any) {
