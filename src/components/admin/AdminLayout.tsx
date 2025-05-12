@@ -1,8 +1,10 @@
 
-import { ReactNode } from "react";
+import { ReactNode, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { ShieldCheck, Home } from "lucide-react";
+import { useAuth } from "@/context/AuthContext";
+import { toast } from "sonner";
 
 type AdminLayoutProps = {
   children: ReactNode;
@@ -11,6 +13,24 @@ type AdminLayoutProps = {
 
 export const AdminLayout = ({ children, title = "Admin Dashboard" }: AdminLayoutProps) => {
   const navigate = useNavigate();
+  const { isAdmin, isLoading } = useAuth();
+  
+  useEffect(() => {
+    // Check admin status once loading is complete
+    if (!isLoading && !isAdmin) {
+      toast.error("Access denied: Admin privileges required");
+      navigate('/');
+    }
+  }, [isAdmin, isLoading, navigate]);
+  
+  // Show loading or redirect if not admin
+  if (isLoading) {
+    return <div className="container-custom py-10">Loading admin access...</div>;
+  }
+  
+  if (!isAdmin) {
+    return null; // Will redirect via the useEffect
+  }
   
   return (
     <div className="container-custom py-10">

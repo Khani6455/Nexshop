@@ -1,11 +1,17 @@
 
 import React, { createContext, useContext, useState, useEffect } from "react";
-import { supabase } from "@/integrations/supabase/client";
-import { Session, User } from "@supabase/supabase-js";
 import { toast } from "sonner";
 
+// Types for our MongoDB-based auth
+interface User {
+  id: string;
+  email: string;
+  firstName?: string;
+  lastName?: string;
+  isAdmin: boolean;
+}
+
 type AuthContextType = {
-  session: Session | null;
   user: User | null;
   isAdmin: boolean;
   isLoading: boolean;
@@ -14,70 +20,53 @@ type AuthContextType = {
   signOut: () => Promise<void>;
 };
 
+const API_URL = 'http://localhost:5000/api';
+
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Set up auth state listener FIRST
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        console.log("Auth state changed:", event, session?.user?.id);
-        setSession(session);
-        setUser(session?.user ?? null);
-        
-        if (session?.user) {
-          // Use setTimeout to avoid Supabase deadlock issues
-          setTimeout(() => {
-            checkAdminStatus(session.user.id);
-          }, 0);
-        } else {
-          setIsAdmin(false);
-          setIsLoading(false);
-        }
-      }
-    );
-
-    // THEN check for existing session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      console.log("Initial session check:", session?.user?.id);
-      setSession(session);
-      setUser(session?.user ?? null);
-      
-      if (session?.user) {
-        checkAdminStatus(session.user.id);
-      } else {
-        setIsLoading(false);
-      }
-    });
-
-    return () => {
-      subscription.unsubscribe();
-    };
+    // Check for token in localStorage
+    const token = localStorage.getItem('authToken');
+    
+    if (token) {
+      fetchCurrentUser(token);
+    } else {
+      setIsLoading(false);
+    }
   }, []);
 
-  const checkAdminStatus = async (userId: string) => {
-    console.log("Checking admin status for user:", userId);
+  const fetchCurrentUser = async (token: string) => {
     try {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('is_admin')
-        .eq('id', userId)
-        .single();
-
-      if (error) {
-        console.error('Error checking admin status:', error);
-        setIsAdmin(false);
-      } else {
-        console.log("Admin status result:", data);
-        setIsAdmin(data?.is_admin || false);
+      const response = await fetch(`${API_URL}/auth/me`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch user data');
       }
+      
+      const userData = await response.json();
+      
+      setUser({
+        id: userData._id,
+        email: userData.email,
+        firstName: userData.firstName,
+        lastName: userData.lastName,
+        isAdmin: userData.isAdmin
+      });
+      
+      setIsAdmin(userData.isAdmin || false);
     } catch (error) {
-      console.error('Error checking admin status:', error);
+      console.error('Error fetching user data:', error);
+      localStorage.removeItem('authToken');
+      setUser(null);
       setIsAdmin(false);
     } finally {
       setIsLoading(false);
@@ -86,24 +75,32 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signUp = async (email: string, password: string, firstName?: string, lastName?: string) => {
     try {
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: {
-            first_name: firstName,
-            last_name: lastName
-          }
-        }
+      const response = await fetch(`${API_URL}/auth/register`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          email,
+          password,
+          firstName,
+          lastName
+        })
       });
-
-      if (error) {
-        console.error("Sign up error:", error);
-        toast.error("Sign up failed: " + error.message);
-        return { error };
+      
+      const data = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(data.message || 'Registration failed');
       }
-
-      // Don't toast success here - the RegisterPage will handle it
+      
+      // Store the token
+      localStorage.setItem('authToken', data.token);
+      
+      // Set user and admin status
+      setUser(data.user);
+      setIsAdmin(data.user.isAdmin || false);
+      
       return { error: null };
     } catch (error: any) {
       console.error("Sign up error:", error);
@@ -114,18 +111,30 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signIn = async (email: string, password: string) => {
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password
+      const response = await fetch(`${API_URL}/auth/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          email,
+          password
+        })
       });
-
-      if (error) {
-        console.error("Sign in error:", error);
-        return { error };
+      
+      const data = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(data.message || 'Login failed');
       }
-
-      console.log("Sign in successful, checking admin status");
-      // Don't toast here - the calling component will handle success
+      
+      // Store the token
+      localStorage.setItem('authToken', data.token);
+      
+      // Set user and admin status
+      setUser(data.user);
+      setIsAdmin(data.user.isAdmin || false);
+      
       return { error: null };
     } catch (error: any) {
       console.error("Sign in error:", error);
@@ -134,12 +143,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const signOut = async () => {
-    await supabase.auth.signOut();
+    // Clear token from localStorage
+    localStorage.removeItem('authToken');
+    
+    // Clear user state
+    setUser(null);
+    setIsAdmin(false);
+    
     toast.success("Signed out successfully");
   };
 
   return (
-    <AuthContext.Provider value={{ session, user, isAdmin, isLoading, signUp, signIn, signOut }}>
+    <AuthContext.Provider value={{ user, isAdmin, isLoading, signUp, signIn, signOut }}>
       {children}
     </AuthContext.Provider>
   );
