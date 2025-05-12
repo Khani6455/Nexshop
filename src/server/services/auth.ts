@@ -66,6 +66,7 @@ export const loginUser = async (email: string, password: string) => {
       throw new Error('Invalid email or password');
     }
     
+    // Now TypeScript knows that user has the comparePassword method
     const isMatch = await user.comparePassword(password);
     
     if (!isMatch) {
