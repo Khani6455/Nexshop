@@ -15,7 +15,7 @@ import LoginPage from "./pages/LoginPage";
 import AdminLoginPage from "./pages/AdminLoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import AccountPage from "./pages/AccountPage";
-import AdminPage from "./pages/AdminPage";
+import AdminDashboard from "./pages/admin/Dashboard";
 import CategoryPage from "./pages/CategoryPage";
 
 const queryClient = new QueryClient();
@@ -37,7 +37,8 @@ const App = () => (
             <Route path="/admin-login" element={<AdminLoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
             <Route path="/account" element={<AccountPage />} />
-            <Route path="/admin" element={<AdminPage />} />
+            <Route path="/admin" element={<AdminDashboard />} />
+            <Route path="/admin/dashboard" element={<AdminDashboard />} />
             <Route path="/category/:category" element={<CategoryPage />} />
             <Route path="*" element={<NotFound />} />
           </Routes>

@@ -1,8 +1,8 @@
 
 import mongoose from 'mongoose';
 
-// MongoDB connection string - should be in an environment variable
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb+srv://your-connection-string';
+// MongoDB connection string from environment variable
+const MONGODB_URI = process.env.MONGODB_URI || 'mongodb+srv://hamzaaslam645555:nexshop@cluster0.7l3yt27.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0';
 
 // Initialize MongoDB connection
 export const connectDB = async () => {
