@@ -33,6 +33,12 @@ app.get('/health', (req, res) => {
 if (process.env.NODE_ENV !== 'test') {
   app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
+    console.log(`API is available at http://localhost:${PORT}/api`);
+    console.log('Health check endpoint: http://localhost:${PORT}/health');
+    console.log('Admin credentials:');
+    console.log('  - Email: admin@nexshop.com');
+    console.log('  - Password: nexshop123');
+    console.log('  - Admin login URL: /admin-login');
   });
 }
 
